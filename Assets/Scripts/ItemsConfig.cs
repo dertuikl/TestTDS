@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ItemsConfig : MonoBehaviour
+[CreateAssetMenu(fileName = "ItemsConfig", menuName = "ScriptableObjects/ItemsConfig")]
+public class ItemsConfig : ScriptableObject
 {
     [Serializable]
-    public class ItemConfig
+    public class ItemData
     {
         public int Id;
         public int StartLevel;
@@ -17,15 +18,13 @@ public class ItemsConfig : MonoBehaviour
     }
 
     [SerializeField]
-    private List<ItemConfig> items;
+    private List<ItemData> items;
 
-    public Item GetItemById(int id)
+    public ItemData GetItemDataById(int id)
     {
-        ItemConfig config = items.FirstOrDefault(i => i.Id == id);
-        if (config != null) {
-            Item item = Instantiate(config.Prefab);
-            item.Initialize(config.StartLevel, config.MaxLevel, config.Producers);
-            return item;
+        ItemData itemData = items.FirstOrDefault(i => i.Id == id);
+        if (itemData != null) {
+            return itemData;
         } else {
             throw new NotImplementedException($"There is no item with id {id} in config");
         }

@@ -2,12 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField]
-    private Vector2Int gridSize = new Vector2Int(7, 7);
+    private Vector2Int boardSize = new Vector2Int(7, 7);
 
     [Serializable]
     public struct ItemPreset
@@ -20,36 +19,33 @@ public class GameController : MonoBehaviour
     
     [SerializeField]
     private List<ItemPreset> boardStart;
-    [SerializeField]
-    private GridLayoutGroup layoutGroup;
-    [SerializeField]
-    private GridCell cellPrefab;
 
-    private RectTransform gridTransform => layoutGroup.transform as RectTransform;
+    [SerializeField]
+    private Board board;
+    [SerializeField]
+    private ItemsConfig itemsConfig;
 
     private void Start()
     {
-        StartGame();
+        StartNewGame();
     }
 
-    private void StartGame()
+    private void StartNewGame()
     {
-        var toDestroy = gridTransform.GetComponentsInChildren<GridCell>();
-        foreach (GridCell cell in toDestroy) {
-            Destroy(cell.gameObject);
-        }
+        board.CreateBoard(boardSize);
 
-        layoutGroup.constraintCount = gridSize.x;
-        layoutGroup.cellSize = CalculateCellSize();
-
-        for (int i = 0; i < gridSize.x * gridSize.y; i++) {
-            Instantiate(cellPrefab, gridTransform);
+        foreach (ItemPreset itemPreset in boardStart) {
+            for (int i = 0; i < itemPreset.Count; i++) {
+                board.PlaceItemToEmptyCell(CreateItemById(itemPreset.Id));
+            }
         }
     }
 
-    private Vector2 CalculateCellSize()
+    private Item CreateItemById(int id)
     {
-        float length = gridTransform.rect.width / gridSize.x;
-        return Vector2.one * length;
+        ItemsConfig.ItemData data = itemsConfig.GetItemDataById(id);
+        Item item = Instantiate(data.Prefab);
+        item.Initialize(data.StartLevel, data.MaxLevel, data.Producers);
+        return item;
     }
 }
