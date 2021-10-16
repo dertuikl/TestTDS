@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Item : MonoBehaviour
+public class Item : MonoBehaviour, IPointerClickHandler
 {
     [Serializable]
     public class Producer
@@ -34,22 +36,30 @@ public class Item : MonoBehaviour
 
         public void Tick()
         {
-            if (Type == ProducerType.Active && Charges <= 0) {
-                return;
-            }
-            
             TimeToCharge--;
             Debug.Log(TimeToCharge);
-            if (TimeToCharge <= 0) {
+            if (Type == ProducerType.Passive) {
                 ProduceItem();
-                TimeToCharge = ChargeRefillTime;
             }
         }
         
         public void ProduceItem()
         {
+            if (TimeToCharge > 0) {
+                return;
+            }
+            
             if(Type == ProducerType.Passive) {
                 board.CreateItemInRandomEmptyCell(ItemToProduceId);
+                TimeToCharge = ChargeRefillTime;
+            }
+
+            if (Type == ProducerType.Active) {
+                if (Charges > 0) {
+                    Charges--;
+                    TimeToCharge += ChargeRefillTime;
+                    board.CreateItemInRandomEmptyCell(ItemToProduceId);
+                }
             }
         }
     }
@@ -85,6 +95,13 @@ public class Item : MonoBehaviour
     {
         foreach (Producer producer in producers) {
             producer.Tick();
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    { 
+        foreach (Producer producer in producers.Where(p => p.Type == Producer.ProducerType.Active)) {
+            producer.ProduceItem();
         }
     }
 }
