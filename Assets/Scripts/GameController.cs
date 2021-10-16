@@ -25,6 +25,9 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private ItemsConfig itemsConfig;
 
+    // can be used for speedup booster or smth
+    private float tickTime = 0.2f;
+    
     private void Start()
     {
         StartNewGame();
@@ -32,20 +35,24 @@ public class GameController : MonoBehaviour
 
     private void StartNewGame()
     {
-        board.CreateBoard(boardSize);
+        board.CreateBoard(boardSize, itemsConfig);
 
         foreach (ItemPreset itemPreset in boardStart) {
             for (int i = 0; i < itemPreset.Count; i++) {
-                board.PlaceItemToEmptyCell(CreateItemById(itemPreset.Id));
+                board.CreateItemInRandomEmptyCell(itemPreset.Id);
             }
         }
+
+        StartCoroutine(GameLoop());
     }
 
-    private Item CreateItemById(int id)
+    private IEnumerator GameLoop()
     {
-        ItemsConfig.ItemData data = itemsConfig.GetItemDataById(id);
-        Item item = Instantiate(data.Prefab);
-        item.Initialize(data.StartLevel, data.MaxLevel, data.Producers);
-        return item;
+        while (true) {
+            //TODO: if game is active
+            board.Tick();
+            
+            yield return new WaitForSeconds(tickTime);
+        }
     }
 }

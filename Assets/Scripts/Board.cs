@@ -13,14 +13,18 @@ public class Board : MonoBehaviour
     private GridCell cellPrefab;
     
     private Vector2Int gridSize;
+    private ItemsConfig itemsConfig;
     private GridCell[,] gridMatrix;
     private List<Vector2Int> emptyCellsCoords;
-    
+    private List<Item> itemsOnBoard;
+
+    private bool boardIsFull => emptyCellsCoords.Count == 0;
     private RectTransform gridTransform => layoutGroup.transform as RectTransform;
 
-    public void CreateBoard(Vector2Int boardSize)
+    public void CreateBoard(Vector2Int boardSize, ItemsConfig itemsConfig)
     {
         this.gridSize = boardSize;
+        this.itemsConfig = itemsConfig;
 
         var toDestroy = gridTransform.GetComponentsInChildren<GridCell>();
         foreach (GridCell cell in toDestroy) {
@@ -38,6 +42,8 @@ public class Board : MonoBehaviour
                 emptyCellsCoords.Add(new Vector2Int(x, y));
             }
         }
+        
+        itemsOnBoard = new List<Item>();
     }
 
     private Vector2 CalculateCellSize()
@@ -46,17 +52,36 @@ public class Board : MonoBehaviour
         return Vector2.one * length;
     }
 
-    public void PlaceItemToEmptyCell(Item item)
+    public void CreateItemInRandomEmptyCell(int itemId)
     {
-        Vector2Int coords = GetEmptyCellCoords();
-        Debug.Log($"Coords: {coords}");
-        PlaceItem(coords, item);
+        if (!boardIsFull) {
+            Item item = CreateItemById(itemId);
+            Vector2Int coords = GetEmptyCellCoords();
+            Debug.Log($"Coords: {coords}");
+            PlaceItem(coords, item);
+        }
+    }
+    
+    private Item CreateItemById(int id)
+    {
+        ItemsConfig.ItemData data = itemsConfig.GetItemDataById(id);
+        Item item = Instantiate(data.Prefab);
+        item.Initialize(this, data.StartLevel, data.MaxLevel, data.Producers);
+        itemsOnBoard.Add(item);
+        return item;
     }
     
     private Vector2Int GetEmptyCellCoords()
     {
         int index = Random.Range(0, emptyCellsCoords.Count - 1);
         return emptyCellsCoords[index];
+    }
+
+    public void Tick()
+    {
+        for (int i = 0; i < itemsOnBoard.Count; i++) {
+            itemsOnBoard[i].Tick();
+        }
     }
     
     public void PlaceItem(Vector2Int coords, Item item)

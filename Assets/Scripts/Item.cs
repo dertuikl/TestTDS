@@ -19,6 +19,39 @@ public class Item : MonoBehaviour
         public int ChargesMax;
         public float ChargeRefillTime;
         public int ItemToProduceId;
+
+        public int Charges { get; private set; }
+        public float TimeToCharge { get; private set; }
+
+        private Board board;
+
+        public void Initialize(Board board)
+        {
+            this.board = board;
+            Charges = ChargesMax;
+            TimeToCharge = ChargeRefillTime;
+        }
+
+        public void Tick()
+        {
+            if (Type == ProducerType.Active && Charges <= 0) {
+                return;
+            }
+            
+            TimeToCharge--;
+            Debug.Log(TimeToCharge);
+            if (TimeToCharge <= 0) {
+                ProduceItem();
+                TimeToCharge = ChargeRefillTime;
+            }
+        }
+        
+        public void ProduceItem()
+        {
+            if(Type == ProducerType.Passive) {
+                board.CreateItemInRandomEmptyCell(ItemToProduceId);
+            }
+        }
     }
 
     [SerializeField]
@@ -30,11 +63,15 @@ public class Item : MonoBehaviour
     [SerializeField]
     private Text levelText;
 
-    public void Initialize(int startLevel, int maxLevel, List<Producer> producers)
+    public void Initialize(Board board, int startLevel, int maxLevel, List<Producer> producers)
     {
         this.currentLevel = startLevel;
         this.maxLevel = maxLevel;
         this.producers = producers;
+        
+        foreach (Producer producer in this.producers) {
+            producer.Initialize(board);
+        }
 
         UpdateView();
     }
@@ -42,5 +79,12 @@ public class Item : MonoBehaviour
     private void UpdateView()
     {
         levelText.text = $"{currentLevel}";
+    }
+
+    public void Tick()
+    {
+        foreach (Producer producer in producers) {
+            producer.Tick();
+        }
     }
 }
