@@ -65,25 +65,23 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
     }
 
     [SerializeField]
-    private List<Producer> producers;
-    [SerializeField]
-    private int currentLevel = 0;
-    [SerializeField]
-    private int maxLevel = 6;
-    [SerializeField]
     private Text levelText;
 
+    private List<Producer> producers;
+    private int maxLevel;
     private Board board;
     private bool pointerIsDown;
     
     public GridCell GridCell { get; private set; }
-    
+    public int CurrentLevel { get; private set; }
+
+    public bool LvlIsMax => CurrentLevel == maxLevel;
     private RectTransform rectTransform => transform as RectTransform;
 
     public void Initialize(Board board, int startLevel, int maxLevel, List<Producer> producers)
     {
         this.board = board;
-        this.currentLevel = startLevel;
+        this.CurrentLevel = startLevel;
         this.maxLevel = maxLevel;
         this.producers = producers;
         
@@ -105,7 +103,7 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
 
     private void UpdateView()
     {
-        levelText.text = $"{currentLevel}";
+        levelText.text = $"{CurrentLevel}";
     }
 
     public void Tick()

@@ -23,11 +23,7 @@ public class GridCell : MonoBehaviour
         item.PlaceToGridCell(this);
     }
 
-    public bool CheckItemCanBePlaced(Item toPlace)
-    {
-        Debug.LogError("CheckItemCanBePlaced is nor implemented yet!");
-        return true;
-    }
+    public bool CheckItemCanBePlaced(Item toPlace) => IsEmpty || !item.LvlIsMax && item.CurrentLevel == toPlace.CurrentLevel;
 
     public void RemoveItem(Item item)
     {
