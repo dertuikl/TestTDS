@@ -139,7 +139,7 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
         pointerIsDown = false;
 
         GridCell cellUnderItem = board.GetCellByTouchPosition(eventData.position);
-        if (!cellUnderItem.IsEmpty && !cellUnderItem.CheckItemCanBePlaced(this)) {
+        if (cellUnderItem == null || !cellUnderItem.CheckItemCanBePlaced(this)) {
             ReturnToGridCell();
             return;
         }
@@ -149,7 +149,7 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
 
     private void ReturnToGridCell()
     {
-        transform.SetParent(GridCell.transform, false);
+        PlaceToGridCell(GridCell);
     }
 
     private void OnClick()

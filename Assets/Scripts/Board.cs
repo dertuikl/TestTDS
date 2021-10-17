@@ -121,12 +121,6 @@ public class Board : MonoBehaviour
 
     public GridCell GetCellByTouchPosition(Vector2 position)
     {
-        Debug.Log($"{position}/{gridMatrix[0,0].transform.position}");
-
-        if (position.x < leftBound || position.x > rightBound || position.y > topBound || position.y < bottomBound) {
-            Debug.LogError("off board!");
-        }
-
         int xMatrixCoord = gridSize.y - 1 - (int)((position.y - bottomBound) / cellSize.y);
         int yMatrixCoord = (int)((position.x - leftBound) / cellSize.x);
 
