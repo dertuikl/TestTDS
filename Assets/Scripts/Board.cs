@@ -17,6 +17,12 @@ public class Board : MonoBehaviour
     private List<Vector2Int> emptyCellsCoords;
     private List<Item> itemsOnBoard;
 
+    private Vector2 cellSize;
+    private float leftBound;
+    private float rightBound;
+    private float topBound;
+    private float bottomBound;
+
     private bool boardIsFull => emptyCellsCoords.Count == 0;
     private RectTransform gridTransform => layoutGroup.transform as RectTransform;
 
@@ -25,22 +31,27 @@ public class Board : MonoBehaviour
         this.gridSize = boardSize;
         this.itemsConfig = itemsConfig;
 
+        cellSize = CalculateCellSize();
+        
         var toDestroy = gridTransform.GetComponentsInChildren<GridCell>();
         foreach (GridCell cell in toDestroy) {
             Destroy(cell.gameObject);
         }
 
         layoutGroup.constraintCount = boardSize.x;
-        layoutGroup.cellSize = CalculateCellSize();
+        layoutGroup.cellSize = cellSize;
         
         gridMatrix = new GridCell[boardSize.y, boardSize.x];
         emptyCellsCoords = new List<Vector2Int>();
         for (int x = 0; x < boardSize.y; x++) {
             for (int y = 0; y < boardSize.y; y++) {
-                gridMatrix[x, y] = Instantiate(cellPrefab, gridTransform);
-                emptyCellsCoords.Add(new Vector2Int(x, y));
+                Vector2Int coords = new Vector2Int(x, y);
+                gridMatrix[x, y] = Instantiate(cellPrefab, gridTransform).Initialize(coords);
+                emptyCellsCoords.Add(coords);
             }
         }
+        
+        StartCoroutine( CalculateBoardBounds());
         
         itemsOnBoard = new List<Item>();
     }
@@ -51,12 +62,21 @@ public class Board : MonoBehaviour
         return Vector2.one * length;
     }
 
+    private IEnumerator CalculateBoardBounds()
+    {
+        yield return new WaitForEndOfFrame();
+        
+        leftBound = gridMatrix[0, 0].transform.position.x - cellSize.x / 2;
+        rightBound = gridMatrix[0, 0].transform.position.x + (gridSize.x - 1) * cellSize.x + cellSize.x / 2;
+        topBound = gridMatrix[0, 0].transform.position.y + cellSize.y / 2;
+        bottomBound = gridMatrix[0, 0].transform.position.y - (gridSize.y - 1) * cellSize.y - cellSize.y / 2;
+    }
+
     public void CreateItemInRandomEmptyCell(int itemId)
     {
         if (!boardIsFull) {
             Item item = CreateItemById(itemId);
             Vector2Int coords = GetEmptyCellCoords();
-            Debug.Log($"Coords: {coords}");
             PlaceItem(coords, item);
         }
     }
@@ -83,9 +103,39 @@ public class Board : MonoBehaviour
         }
     }
     
-    public void PlaceItem(Vector2Int coords, Item item)
+    private void PlaceItem(Vector2Int coords, Item item)
     {
         gridMatrix[coords.x, coords.y].PlaceItem(item);
-        emptyCellsCoords.Remove(coords);
+        if(emptyCellsCoords.Contains(coords)) {
+            emptyCellsCoords.Remove(coords);
+        }
     }
+
+    public void MoveItemOnBoard(Item item, GridCell targetCell)
+    {
+        emptyCellsCoords.Add(item.GridCell.Coords);
+        item.GridCell.RemoveItem(item);
+        
+        PlaceItem(targetCell.Coords, item);
+    }
+
+    public GridCell GetCellByTouchPosition(Vector2 position)
+    {
+        Debug.Log($"{position}/{gridMatrix[0,0].transform.position}");
+
+        if (position.x < leftBound || position.x > rightBound || position.y > topBound || position.y < bottomBound) {
+            Debug.LogError("off board!");
+        }
+
+        int xMatrixCoord = gridSize.y - 1 - (int)((position.y - bottomBound) / cellSize.y);
+        int yMatrixCoord = (int)((position.x - leftBound) / cellSize.x);
+
+        if (IsOnGrid(new Vector2Int(xMatrixCoord, yMatrixCoord))) {
+            return gridMatrix[xMatrixCoord, yMatrixCoord];
+        }
+        
+        return null;
+    }
+
+    private bool IsOnGrid(Vector2Int matrixCoords) => matrixCoords.x >= 0 && matrixCoords.x < gridSize.y && matrixCoords.y >= 0 && matrixCoords.y < gridSize.x;
 }

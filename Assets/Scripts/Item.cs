@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Item : MonoBehaviour, IPointerClickHandler
+public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     [Serializable]
     public class Producer
@@ -37,7 +37,7 @@ public class Item : MonoBehaviour, IPointerClickHandler
         public void Tick()
         {
             TimeToCharge--;
-            Debug.Log(TimeToCharge);
+            // Debug.Log(TimeToCharge);
             if (Type == ProducerType.Passive) {
                 ProduceItem();
             }
@@ -73,8 +73,16 @@ public class Item : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     private Text levelText;
 
+    private Board board;
+    private bool pointerIsDown;
+    
+    public GridCell GridCell { get; private set; }
+    
+    private RectTransform rectTransform => transform as RectTransform;
+
     public void Initialize(Board board, int startLevel, int maxLevel, List<Producer> producers)
     {
+        this.board = board;
         this.currentLevel = startLevel;
         this.maxLevel = maxLevel;
         this.producers = producers;
@@ -84,6 +92,15 @@ public class Item : MonoBehaviour, IPointerClickHandler
         }
 
         UpdateView();
+    }
+
+    public void PlaceToGridCell(GridCell gridCell)
+    {
+        GridCell = gridCell;
+        transform.SetParent(gridCell.transform, false);
+        
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
     }
 
     private void UpdateView()
@@ -98,7 +115,44 @@ public class Item : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        pointerIsDown = true;
+        transform.SetParent(board.transform);
+        
+        OnDrag(eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        pointerIsDown = false;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(board.transform as RectTransform, eventData.position, eventData.enterEventCamera, out Vector2 newPosition);
+        rectTransform.anchoredPosition = newPosition;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (pointerIsDown) {
+            OnClick();
+        }
+
+        pointerIsDown = false;
+
+        GridCell cellUnderItem = board.GetCellByTouchPosition(eventData.position);
+        if (!cellUnderItem.IsEmpty && !cellUnderItem.CheckItemCanBePlaced(this)) {
+            ReturnToGridCell();
+            return;
+        }
+        
+        board.MoveItemOnBoard(this, cellUnderItem);
+    }
+
+    private void ReturnToGridCell()
+    {
+        transform.SetParent(GridCell.transform, false);
+    }
+
+    private void OnClick()
     { 
         foreach (Producer producer in producers.Where(p => p.Type == Producer.ProducerType.Active)) {
             producer.ProduceItem();
