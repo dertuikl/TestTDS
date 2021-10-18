@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -122,10 +122,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 784ea5b02fb0e45079ef62906f88dbe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  producers: []
-  currentLevel: 0
-  maxLevel: 0
   levelText: {fileID: 1401765602120276857}
+  activeProducerViewPrefab: {fileID: 2661394684476023306, guid: 061f102c75e8a4258ad451f0b677166a,
+    type: 3}
 --- !u!1 &9125816445866659733
 GameObject:
   m_ObjectHideFlags: 0

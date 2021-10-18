@@ -19,12 +19,16 @@ public class Producer
     public float TimeToCharge { get; private set; }
 
     private Board board;
+    private ActiveProducerView activeProducerView;
 
-    public void Initialize(Board board)
+    public void Initialize(Board board, ActiveProducerView activeProducerView = null)
     {
         this.board = board;
+        this.activeProducerView = activeProducerView;
         Charges = ChargesMax;
         TimeToCharge = ChargeRefillTime;
+
+        this.activeProducerView?.Initialize(ChargeRefillTime - TimeToCharge, ChargeRefillTime);
     }
 
     public void Tick()
@@ -33,7 +37,7 @@ public class Producer
         if (Type == ProducerType.Passive) {
             ProduceItem();
         } else {
-            Debug.Log(TimeToCharge);
+            activeProducerView?.SetValue(ChargeRefillTime - TimeToCharge);
         }
     }
         
@@ -53,6 +57,11 @@ public class Producer
                 Charges--;
                 TimeToCharge += ChargeRefillTime;
                 board.CreateItemInRandomEmptyCell(ItemToProduceId);
+                
+                if(Charges == 0) {
+                    activeProducerView.DestroyView();
+                    activeProducerView = null;
+                }
             }
         }
     }

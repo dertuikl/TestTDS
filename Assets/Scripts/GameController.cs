@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
     private ItemsConfig itemsConfig;
 
     // can be used for speedup booster or smth
-    private float tickTime = .2f;
+    private float tickTime = 1.0f;
     
     private void Start()
     {

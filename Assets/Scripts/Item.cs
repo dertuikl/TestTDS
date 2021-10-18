@@ -16,29 +16,39 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
 {
     [SerializeField]
     private Text levelText;
+    [SerializeField]
+    private ActiveProducerView activeProducerViewPrefab;
 
     private List<Producer> producers;
     private Board board;
+    private ItemType itemType;
     private int level;
     private int maxLevel;
     private bool pointerIsDown;
+    private ActiveProducerView activeProducerView;
     
     public GridCell GridCell { get; private set; }
     public int Id { get; private set; }
     
     public bool LvlIsMax => level == maxLevel;
     private RectTransform rectTransform => transform as RectTransform;
+    private ItemType type;
 
     public void Initialize(Board board, ItemsConfig.ItemData itemData)
     {
         this.board = board;
         Id = itemData.Id;
+        itemType = itemData.Type;
         level = itemData.Level;
         maxLevel = itemData.MaxLevel;
         producers = itemData.Producers;
         
         foreach (Producer producer in producers) {
-            producer.Initialize(board);
+            ActiveProducerView view = null;
+            if (producer.Type == Producer.ProducerType.Active) {
+                view = Instantiate(activeProducerViewPrefab, transform, false);
+            }
+            producer.Initialize(board, view);
         }
 
         UpdateView();
@@ -55,7 +65,7 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
 
     private void UpdateView()
     {
-        levelText.text = $"{level}";
+        levelText.text = $"{itemType}{level}";
     }
 
     public void Tick()
