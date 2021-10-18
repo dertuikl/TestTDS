@@ -6,86 +6,38 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+public enum ItemType
+{
+    A,
+    B
+}
+
 public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
-    [Serializable]
-    public class Producer
-    {
-        public enum ProducerType
-        {
-            Passive,
-            Active
-        }
-
-        public ProducerType Type;
-        public int ChargesMax;
-        public float ChargeRefillTime;
-        public int ItemToProduceId;
-
-        public int Charges { get; private set; }
-        public float TimeToCharge { get; private set; }
-
-        private Board board;
-
-        public void Initialize(Board board)
-        {
-            this.board = board;
-            Charges = ChargesMax;
-            TimeToCharge = ChargeRefillTime;
-        }
-
-        public void Tick()
-        {
-            TimeToCharge--;
-            // Debug.Log(TimeToCharge);
-            if (Type == ProducerType.Passive) {
-                ProduceItem();
-            }
-        }
-        
-        public void ProduceItem()
-        {
-            if (TimeToCharge > 0) {
-                return;
-            }
-            
-            if(Type == ProducerType.Passive) {
-                board.CreateItemInRandomEmptyCell(ItemToProduceId);
-                TimeToCharge = ChargeRefillTime;
-            }
-
-            if (Type == ProducerType.Active) {
-                if (Charges > 0) {
-                    Charges--;
-                    TimeToCharge += ChargeRefillTime;
-                    board.CreateItemInRandomEmptyCell(ItemToProduceId);
-                }
-            }
-        }
-    }
-
     [SerializeField]
     private Text levelText;
 
     private List<Producer> producers;
-    private int maxLevel;
     private Board board;
+    private int level;
+    private int maxLevel;
     private bool pointerIsDown;
     
     public GridCell GridCell { get; private set; }
-    public int CurrentLevel { get; private set; }
-
-    public bool LvlIsMax => CurrentLevel == maxLevel;
+    public int Id { get; private set; }
+    
+    public bool LvlIsMax => level == maxLevel;
     private RectTransform rectTransform => transform as RectTransform;
 
-    public void Initialize(Board board, int startLevel, int maxLevel, List<Producer> producers)
+    public void Initialize(Board board, ItemsConfig.ItemData itemData)
     {
         this.board = board;
-        this.CurrentLevel = startLevel;
-        this.maxLevel = maxLevel;
-        this.producers = producers;
+        Id = itemData.Id;
+        level = itemData.Level;
+        maxLevel = itemData.MaxLevel;
+        producers = itemData.Producers;
         
-        foreach (Producer producer in this.producers) {
+        foreach (Producer producer in producers) {
             producer.Initialize(board);
         }
 
@@ -103,7 +55,7 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
 
     private void UpdateView()
     {
-        levelText.text = $"{CurrentLevel}";
+        levelText.text = $"{level}";
     }
 
     public void Tick()
@@ -117,8 +69,6 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
     {
         pointerIsDown = true;
         transform.SetParent(board.transform);
-        
-        OnDrag(eventData);
     }
 
     public void OnDrag(PointerEventData eventData)

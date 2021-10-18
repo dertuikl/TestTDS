@@ -85,7 +85,7 @@ public class Board : MonoBehaviour
     {
         ItemsConfig.ItemData data = itemsConfig.GetItemDataById(id);
         Item item = Instantiate(data.Prefab);
-        item.Initialize(this, data.StartLevel, data.MaxLevel, data.Producers);
+        item.Initialize(this, data);
         itemsOnBoard.Add(item);
         return item;
     }
@@ -115,8 +115,16 @@ public class Board : MonoBehaviour
     {
         emptyCellsCoords.Add(item.GridCell.Coords);
         item.GridCell.RemoveItem(item);
-        
-        PlaceItem(targetCell.Coords, item);
+
+        if (!targetCell.IsEmpty) {
+            int nextLvlItemId = itemsConfig.GetNextLevelItemId(item.Id);
+            Item nextLvlItem = CreateItemById(nextLvlItemId);
+            RemoveItem(targetCell.item);
+            RemoveItem(item);
+            PlaceItem(targetCell.Coords, nextLvlItem);
+        } else {
+            PlaceItem(targetCell.Coords, item);
+        }
     }
 
     public GridCell GetCellByTouchPosition(Vector2 position)
@@ -132,4 +140,11 @@ public class Board : MonoBehaviour
     }
 
     private bool IsOnGrid(Vector2Int matrixCoords) => matrixCoords.x >= 0 && matrixCoords.x < gridSize.y && matrixCoords.y >= 0 && matrixCoords.y < gridSize.x;
+
+    private void RemoveItem(Item item)
+    {
+        itemsOnBoard.Remove(item);
+        item.GridCell.Clear();
+        Destroy(item.gameObject);
+    }
 }

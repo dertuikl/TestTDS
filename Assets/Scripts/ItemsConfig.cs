@@ -11,9 +11,10 @@ public class ItemsConfig : ScriptableObject
     public class ItemData
     {
         public int Id;
-        public int StartLevel;
+        public ItemType Type;
+        public int Level;
         public int MaxLevel;
-        public List<Item.Producer> Producers;
+        public List<Producer> Producers;
         public Item Prefab;
     }
 
@@ -25,8 +26,23 @@ public class ItemsConfig : ScriptableObject
         ItemData itemData = items.FirstOrDefault(i => i.Id == id);
         if (itemData != null) {
             return itemData;
-        } else {
-            throw new NotImplementedException($"There is no item with id {id} in config");
         }
+
+        throw new NotImplementedException($"There is no item with id {id} in config");
+    }
+
+    public int GetNextLevelItemId(int id)
+    {
+        ItemData itemData = items.FirstOrDefault(i => i.Id == id);
+        if (itemData != null) {
+            ItemData nextItemData = items.FirstOrDefault(i => i.Type == itemData.Type && i.Level == itemData.Level + 1);
+            if (nextItemData == null) {
+                Debug.LogError($"Trying to get next level item for already maxed item");
+                return itemData.Id;
+            }
+            return nextItemData.Id;
+        }
+        
+        throw new NotImplementedException($"There is no item with id {id} in config");
     }
 }

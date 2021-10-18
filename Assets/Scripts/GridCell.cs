@@ -1,12 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GridCell : MonoBehaviour
 {
-    [SerializeField]
-    private Item item;
-    
+    public Item item { get; private set; }
     public Vector2Int Coords { get; private set; }
 
     public bool IsEmpty => item == null;
@@ -17,18 +16,30 @@ public class GridCell : MonoBehaviour
         return this;
     }
     
-    public void PlaceItem(Item item)
+    public void PlaceItem(Item newItem)
     {
-        this.item = item;
-        item.PlaceToGridCell(this);
+        if (item == null) {
+            item = newItem;
+            item.PlaceToGridCell(this);
+        } else {
+            throw new NotImplementedException($"Attempt to place item in not empty cell.");
+        }
     }
 
-    public bool CheckItemCanBePlaced(Item toPlace) => IsEmpty || !item.LvlIsMax && item.CurrentLevel == toPlace.CurrentLevel;
+    public bool CheckItemCanBePlaced(Item toPlace) => IsEmpty || !item.LvlIsMax;// && item.level == toPlace.level;
 
     public void RemoveItem(Item item)
     {
         if (this.item == item) {
             this.item = null;
+        }
+    }
+
+    public void Clear()
+    {
+        if(item != null) {
+            Destroy(item.gameObject);
+            RemoveItem(item);
         }
     }
 }
