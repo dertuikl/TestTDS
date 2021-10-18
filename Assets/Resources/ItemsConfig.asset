@@ -14,55 +14,64 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   items:
   - Id: 0
-    StartLevel: 1
+    Type: 0
+    Level: 1
     MaxLevel: 6
     Producers: []
     Prefab: {fileID: 4596683973822874283, guid: 907787271aec846c7b7d140200d16c39,
       type: 3}
   - Id: 1
-    StartLevel: 2
+    Type: 0
+    Level: 2
     MaxLevel: 6
     Producers: []
     Prefab: {fileID: 4596683973822874283, guid: 907787271aec846c7b7d140200d16c39,
       type: 3}
   - Id: 2
-    StartLevel: 3
+    Type: 0
+    Level: 3
     MaxLevel: 6
     Producers: []
     Prefab: {fileID: 4596683973822874283, guid: 907787271aec846c7b7d140200d16c39,
       type: 3}
   - Id: 3
-    StartLevel: 4
+    Type: 0
+    Level: 4
     MaxLevel: 6
     Producers: []
     Prefab: {fileID: 4596683973822874283, guid: 907787271aec846c7b7d140200d16c39,
       type: 3}
   - Id: 4
-    StartLevel: 5
+    Type: 0
+    Level: 5
     MaxLevel: 6
     Producers: []
     Prefab: {fileID: 4596683973822874283, guid: 907787271aec846c7b7d140200d16c39,
       type: 3}
   - Id: 5
-    StartLevel: 6
+    Type: 0
+    Level: 6
     MaxLevel: 6
     Producers: []
     Prefab: {fileID: 4596683973822874283, guid: 907787271aec846c7b7d140200d16c39,
       type: 3}
   - Id: 6
-    StartLevel: 1
+    Type: 1
+    Level: 1
     MaxLevel: 7
     Producers: []
     Prefab: {fileID: 7473237150618019421, guid: 56dd46eab49174b2bb28df5ffb6c5c4d,
       type: 3}
   - Id: 7
-    StartLevel: 2
+    Type: 1
+    Level: 2
     MaxLevel: 7
     Producers: []
     Prefab: {fileID: 7473237150618019421, guid: 56dd46eab49174b2bb28df5ffb6c5c4d,
       type: 3}
   - Id: 8
-    StartLevel: 3
+    Type: 1
+    Level: 3
     MaxLevel: 7
     Producers:
     - Type: 0
@@ -72,7 +81,8 @@ MonoBehaviour:
     Prefab: {fileID: 7473237150618019421, guid: 56dd46eab49174b2bb28df5ffb6c5c4d,
       type: 3}
   - Id: 9
-    StartLevel: 4
+    Type: 1
+    Level: 4
     MaxLevel: 7
     Producers:
     - Type: 0
@@ -82,7 +92,8 @@ MonoBehaviour:
     Prefab: {fileID: 7473237150618019421, guid: 56dd46eab49174b2bb28df5ffb6c5c4d,
       type: 3}
   - Id: 10
-    StartLevel: 5
+    Type: 1
+    Level: 5
     MaxLevel: 7
     Producers:
     - Type: 0
@@ -96,7 +107,8 @@ MonoBehaviour:
     Prefab: {fileID: 7473237150618019421, guid: 56dd46eab49174b2bb28df5ffb6c5c4d,
       type: 3}
   - Id: 11
-    StartLevel: 6
+    Type: 1
+    Level: 6
     MaxLevel: 7
     Producers:
     - Type: 0
@@ -110,7 +122,8 @@ MonoBehaviour:
     Prefab: {fileID: 7473237150618019421, guid: 56dd46eab49174b2bb28df5ffb6c5c4d,
       type: 3}
   - Id: 12
-    StartLevel: 7
+    Type: 1
+    Level: 7
     MaxLevel: 7
     Producers:
     - Type: 0
