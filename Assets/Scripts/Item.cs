@@ -96,7 +96,7 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
         pointerIsDown = false;
 
         GridCell cellUnderItem = board.GetCellByTouchPosition(eventData.position);
-        if (cellUnderItem == null || !cellUnderItem.CheckItemCanBePlaced(this)) {
+        if (!cellUnderItem.CheckItemCanBePlaced(this)) {
             ReturnToGridCell();
             return;
         }

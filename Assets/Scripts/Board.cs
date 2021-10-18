@@ -18,10 +18,6 @@ public class Board : MonoBehaviour
     private List<Item> itemsOnBoard;
 
     private Vector2 cellSize;
-    private float leftBound;
-    private float rightBound;
-    private float topBound;
-    private float bottomBound;
 
     private bool boardIsFull => emptyCellsCoords.Count == 0;
     private RectTransform gridTransform => layoutGroup.transform as RectTransform;
@@ -51,8 +47,6 @@ public class Board : MonoBehaviour
             }
         }
         
-        StartCoroutine( CalculateBoardBounds());
-        
         itemsOnBoard = new List<Item>();
     }
 
@@ -60,16 +54,6 @@ public class Board : MonoBehaviour
     {
         float length = gridTransform.rect.width / gridSize.x;
         return Vector2.one * length;
-    }
-
-    private IEnumerator CalculateBoardBounds()
-    {
-        yield return new WaitForEndOfFrame();
-        
-        leftBound = gridMatrix[0, 0].transform.position.x - cellSize.x / 2;
-        rightBound = gridMatrix[0, 0].transform.position.x + (gridSize.x - 1) * cellSize.x + cellSize.x / 2;
-        topBound = gridMatrix[0, 0].transform.position.y + cellSize.y / 2;
-        bottomBound = gridMatrix[0, 0].transform.position.y - (gridSize.y - 1) * cellSize.y - cellSize.y / 2;
     }
 
     public void CreateItemInRandomEmptyCell(int itemId)
@@ -127,16 +111,21 @@ public class Board : MonoBehaviour
         }
     }
 
-    public GridCell GetCellByTouchPosition(Vector2 position)
-    {
-        int xMatrixCoord = gridSize.y - 1 - (int)((position.y - bottomBound) / cellSize.y);
-        int yMatrixCoord = (int)((position.x - leftBound) / cellSize.x);
-
-        if (IsOnGrid(new Vector2Int(xMatrixCoord, yMatrixCoord))) {
-            return gridMatrix[xMatrixCoord, yMatrixCoord];
-        }
-        
-        return null;
+    public GridCell GetCellByTouchPosition(Vector2 position) 
+    { 
+        GridCell result = gridMatrix[0, 0]; 
+        foreach (var gridCell in this.gridMatrix) { 
+            result = ClosestToPosition(result, gridCell); 
+ 
+            GridCell ClosestToPosition(GridCell a, GridCell b) 
+            { 
+                float distanceA = Mathf.Abs(Vector2.Distance(a.transform.position, position)); 
+                float distanceB = Mathf.Abs(Vector2.Distance(b.transform.position, position));
+                return distanceA < distanceB ? a : b;
+            } 
+        } 
+ 
+        return result; 
     }
 
     private bool IsOnGrid(Vector2Int matrixCoords) => matrixCoords.x >= 0 && matrixCoords.x < gridSize.y && matrixCoords.y >= 0 && matrixCoords.y < gridSize.x;
