@@ -26,7 +26,7 @@ public class GridCell : MonoBehaviour
         }
     }
 
-    public bool CheckItemCanBePlaced(Item toPlace) => IsEmpty || !item.LvlIsMax;// && item.level == toPlace.level;
+    public bool CheckItemCanBePlaced(Item toPlace) => IsEmpty || item.CanBeMergedTo(toPlace);
 
     public void RemoveItem(Item item)
     {

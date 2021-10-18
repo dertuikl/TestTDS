@@ -30,7 +30,6 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
     public GridCell GridCell { get; private set; }
     public int Id { get; private set; }
     
-    public bool LvlIsMax => level == maxLevel;
     private RectTransform rectTransform => transform as RectTransform;
     private ItemType type;
 
@@ -116,4 +115,6 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
             producer.ProduceItem();
         }
     }
+
+    public bool CanBeMergedTo(Item item) => level != maxLevel && Id == item.Id;
 }
