@@ -603,7 +603,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boardSize: {x: 7, y: 7}
   boardStart:
-  - Id: 8
+  - Id: 10
     Count: 1
   board: {fileID: 1458886528}
   itemsConfig: {fileID: 11400000, guid: d93eff6ffa423441895e63d1ea7ef735, type: 2}
