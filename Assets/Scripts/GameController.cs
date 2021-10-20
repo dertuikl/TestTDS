@@ -40,7 +40,6 @@ public class GameController : MonoBehaviour
 
     private void StartNewGame()
     {
-        Debug.Log("StartNewGame");
         board.CreateBoard(boardSize, itemsConfig);
 
         foreach (ItemPreset itemPreset in boardStart) {
@@ -54,7 +53,6 @@ public class GameController : MonoBehaviour
 
     private void LoadSavedGame(BoardSaveData savedData)
     {
-        Debug.Log("LoadSavedGame");
         board.CreateBoard(savedData.GridSize, itemsConfig);
 
         foreach (GridCellSaveData cellSaveData in savedData.CellsSaveData) {
@@ -89,5 +87,10 @@ public class GameController : MonoBehaviour
     {
         DataSaver saver = new DataSaver();
         return saver.Load("Board");
+    }
+
+    public void OnClickNewGame()
+    {
+        StartNewGame();
     }
 }
