@@ -36,6 +36,12 @@ public class Producer
     {
         Charges = savedData.Charges;
         TimeToCharge = savedData.TimeToCharge;
+        
+        if(Charges == 0) {
+            activeProducerView?.DestroyView();
+            activeProducerView = null;
+        }
+        
         UpdateView();
     }
     
