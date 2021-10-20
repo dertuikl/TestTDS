@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 public class GridCell : MonoBehaviour
@@ -42,4 +43,22 @@ public class GridCell : MonoBehaviour
             RemoveItem(item);
         }
     }
+
+    public GridCellSaveData GetSaveData()
+    {
+        return new GridCellSaveData {
+            Coords = Coords,
+            ItemData = item?.GetSaveData()
+        };
+    }
+}
+
+[DataContract]
+[Serializable]
+public class GridCellSaveData
+{
+    [DataMember]
+    public Vector2Int Coords;
+    [DataMember]
+    public ItemSaveData ItemData;
 }

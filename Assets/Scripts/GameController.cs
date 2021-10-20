@@ -30,11 +30,17 @@ public class GameController : MonoBehaviour
     
     private void Start()
     {
-        StartNewGame();
+        BoardSaveData savedData = LoadSavedBoardState();
+        if(savedData == null) {
+            StartNewGame();
+        } else {
+            LoadSavedGame(savedData);
+        }
     }
 
     private void StartNewGame()
     {
+        Debug.Log("StartNewGame");
         board.CreateBoard(boardSize, itemsConfig);
 
         foreach (ItemPreset itemPreset in boardStart) {
@@ -46,6 +52,18 @@ public class GameController : MonoBehaviour
         StartCoroutine(GameLoop());
     }
 
+    private void LoadSavedGame(BoardSaveData savedData)
+    {
+        Debug.Log("LoadSavedGame");
+        board.CreateBoard(savedData.GridSize, itemsConfig);
+
+        foreach (GridCellSaveData cellSaveData in savedData.CellsSaveData) {
+            board.CreateItemBySavedData(cellSaveData.ItemData, cellSaveData.Coords);
+        }
+        
+        StartCoroutine(GameLoop());
+    }
+
     private IEnumerator GameLoop()
     {
         while (true) {
@@ -54,5 +72,22 @@ public class GameController : MonoBehaviour
             
             yield return new WaitForSeconds(tickTime);
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveBoardState();
+    }
+
+    private void SaveBoardState()
+    {
+        DataSaver saver = new DataSaver();
+        saver.Save("Board", board.GetSaveData());
+    }
+
+    private BoardSaveData LoadSavedBoardState()
+    {
+        DataSaver saver = new DataSaver();
+        return saver.Load("Board");
     }
 }

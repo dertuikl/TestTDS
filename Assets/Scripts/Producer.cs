@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 [Serializable]
@@ -31,13 +32,20 @@ public class Producer
         this.activeProducerView?.Initialize(ChargeRefillTime - TimeToCharge, ChargeRefillTime);
     }
 
+    public void LoadSavedData(ProducerSaveData savedData)
+    {
+        Charges = savedData.Charges;
+        TimeToCharge = savedData.TimeToCharge;
+        UpdateView();
+    }
+    
     public void Tick()
     {
         TimeToCharge--;
         if (Type == ProducerType.Passive) {
             ProduceItem();
         } else {
-            activeProducerView?.SetValue(ChargeRefillTime - TimeToCharge);
+            UpdateView();
         }
     }
         
@@ -65,4 +73,27 @@ public class Producer
             }
         }
     }
+
+    private void UpdateView()
+    {
+        activeProducerView?.SetValue(ChargeRefillTime - TimeToCharge);
+    }
+
+    public ProducerSaveData GetSaveData()
+    {
+        return new ProducerSaveData {
+            Charges = Charges,
+            TimeToCharge = TimeToCharge
+        };
+    }
+}
+
+[DataContract]
+[Serializable]
+public class ProducerSaveData
+{
+    [DataMember]
+    public int Charges;
+    [DataMember]
+    public float TimeToCharge;
 }

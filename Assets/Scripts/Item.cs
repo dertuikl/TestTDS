@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -51,6 +52,13 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
         }
 
         UpdateView();
+    }
+
+    public void LoadSavedData(ItemSaveData data)
+    {
+        for (int i = 0; i < producers.Count; i++) {
+            producers[i].LoadSavedData(data.ProducersSaveData[i]);
+        }
     }
 
     public void PlaceToGridCell(GridCell gridCell)
@@ -117,4 +125,27 @@ public class Item : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUp
     }
 
     public bool CanBeMergedTo(Item item) => level != maxLevel && Id == item.Id;
+
+    public ItemSaveData GetSaveData()
+    {
+        List<ProducerSaveData> producesData = new List<ProducerSaveData>();
+        foreach (Producer producer in producers) {
+            producesData.Add(producer.GetSaveData());
+        }
+        
+        return new ItemSaveData {
+            Id = Id,
+            ProducersSaveData = producesData
+        };
+    }
+}
+
+[DataContract]
+[Serializable]
+public class ItemSaveData
+{
+    [DataMember]
+    public int Id;
+    [DataMember]
+    public List<ProducerSaveData> ProducersSaveData;
 }

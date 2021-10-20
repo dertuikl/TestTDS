@@ -1,7 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
 
 public class Board : MonoBehaviour
@@ -63,6 +66,13 @@ public class Board : MonoBehaviour
             Vector2Int coords = GetEmptyCellCoords();
             PlaceItem(coords, item);
         }
+    }
+    
+    public void CreateItemBySavedData(ItemSaveData saveData, Vector2Int coords)
+    {
+        Item item = CreateItemById(saveData.Id);
+        item.LoadSavedData(saveData);
+        PlaceItem(coords, item);
     }
     
     private Item CreateItemById(int id)
@@ -136,4 +146,30 @@ public class Board : MonoBehaviour
         item.GridCell.Clear();
         Destroy(item.gameObject);
     }
+
+    public BoardSaveData GetSaveData()
+    {
+        BoardSaveData saveData = new BoardSaveData();
+        saveData.GridSize = gridSize;
+        
+        List<GridCellSaveData> cellsSaveData = new List<GridCellSaveData>();
+        foreach (GridCell cell in gridMatrix) {
+            if(!cell.IsEmpty) {
+                cellsSaveData.Add(cell.GetSaveData());
+            }
+        }
+        saveData.CellsSaveData = cellsSaveData;
+        
+        return saveData;
+    }
+}
+
+[DataContract]
+[Serializable]
+public class BoardSaveData
+{
+    [DataMember]
+    public Vector2Int GridSize;
+    [DataMember]
+    public List<GridCellSaveData> CellsSaveData;
 }
