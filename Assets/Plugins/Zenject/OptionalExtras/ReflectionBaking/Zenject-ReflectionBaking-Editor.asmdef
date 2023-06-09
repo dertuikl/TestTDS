@@ -1,0 +1,15 @@
+{
+    "name": "Zenject-ReflectionBaking-Editor",
+    "references": [
+        "Zenject",
+        "Zenject-Editor",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
